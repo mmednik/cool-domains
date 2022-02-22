@@ -1,25 +1,20 @@
 const main = async () => {
-  // The first return is the deployer, the second is a random account
-  const [owner, randomPerson] = await hre.ethers.getSigners();
-  const domainContractFactory = await hre.ethers.getContractFactory("Domains");
-  const domainContract = await domainContractFactory.deploy();
+  const domainContractFactory = await hre.ethers.getContractFactory('Domains');
+  const domainContract = await domainContractFactory.deploy("insignia");
   await domainContract.deployed();
-  console.log("Contract deployed to:", domainContract.address);
-  console.log("Contract deployed by:", owner.address);
 
-  let txn = await domainContract.register("doom");
+  console.log("Contract deployed to:", domainContract.address);
+
+  // We're passing in a second variable - value. This is the moneyyyyyyyyyy
+  let txn = await domainContract.register("mortal",  {value: hre.ethers.utils.parseEther('0.1')});
   await txn.wait();
 
-  const domainAddress = await domainContract.getAddress("doom");
-  console.log("Owner of domain doom:", domainAddress);
+  const address = await domainContract.getAddress("mortal");
+  console.log("Owner of domain mortal:", address);
 
-  txn = await domainContract.setIpfsUrl("doom", "https://ipfs.io/ipfs/QmbHRN8tjfMv1cXks9URGvkKnSxtAcP1bH2hB3ySeyZgUY?filename=ejemplo.txt");
-  await txn.wait()
-  console.log("IPFS url recorded for domain doom");
-  
-  const ipfsUrlRecorded = await domainContract.getIpfsUrl("doom");
-  console.log("IPFS url of domain doom:", ipfsUrlRecorded);
-};
+  const balance = await hre.ethers.provider.getBalance(domainContract.address);
+  console.log("Contract balance:", hre.ethers.utils.formatEther(balance));
+}
 
 const runMain = async () => {
   try {
